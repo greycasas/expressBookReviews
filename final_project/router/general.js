@@ -93,7 +93,7 @@ public_users.get('/review/:isbn', function (req, res) {
   let reviews = books[isbn].reviews;
   reviews = JSON.stringify(reviews);
   if (reviews != '{}') {
-    return res.status(200).send(reviews );
+    return res.status(200).send(reviews);
   } else {
     return res.status(404).json({ error: "This book has no reviews." });
   }
@@ -110,9 +110,47 @@ async function getAllBooks() {
     console.error("Error while fetching all books:", error.message);
   }
 }
-// Execute
+
+
+// Task 11: Get book by ISBN (using Promises)
+function getBookByISBN(isbn) {
+  axios.get(`${BASE_URL}/isbn/${isbn}`)
+    .then(response => {
+      console.log(`Book with ISBN ${isbn}:`, response.data);
+    })
+    .catch(error => {
+      console.error(`Error while fetching book with ISBN ${isbn}:`, error.message);
+    });
+}
+
+// Task 12: Get books by author (using Promises)
+function getBooksByAuthor(author) {
+  axios.get(`${BASE_URL}/author/${author}`)
+    .then(response => {
+      console.log(`Books by author ${author}:`, response.data);
+    })
+    .catch(error => {
+      console.error(`Error while fetching books by author ${author}:`, error.message);
+    });
+}
+
+// Task 13: Get books by title (using Promises)
+function getBooksByTitle(title) {
+  axios.get(`${BASE_URL}/title/${title}`)
+    .then(response => {
+      console.log(`Books with title "${title}":`, response.data);
+    })
+    .catch(error => {
+      console.error(`Error while fetching books with title "${title}":`, error.message);
+    });
+}
+
+// Execute Axios
 (async () => {
   await getAllBooks();
+  getBookByISBN('1');
+  getBooksByAuthor('Hans Christian Andersen');
+  getBooksByTitle('Things Fall Apart');
 })();
 
 module.exports.general = public_users;
