@@ -23,7 +23,8 @@ public_users.post("/register", (req, res) => {
 
 // Get the book list available in the shop
 public_users.get('/', function (req, res) {
-  return res.status(200).send(JSON.stringify(books));
+  let listOfBooks = { books: books };
+  return res.status(200).send(JSON.stringify(listOfBooks));
 
 });
 
@@ -42,7 +43,7 @@ public_users.get('/isbn/:isbn', function (req, res) {
 // Get book details based on author
 public_users.get('/author/:author', function (req, res) {
   let author = req.params.author.toLowerCase();
-  let book = {};
+  let book = [];
   let keys = Object.keys(books);
 
   for (let i = 0; i < keys.length; i++) {
@@ -50,21 +51,28 @@ public_users.get('/author/:author', function (req, res) {
     let currentAuthor = currentBooks["author"].toLowerCase();
 
     if (currentAuthor === author) {
-      book[i + 1] = currentBooks;
+      book.push({
+        "isbn": i + 1,
+        "title": currentBooks["title"],
+        "reviews": currentBooks["reviews"]
+      });
     }
-
   }
-  if (Object.keys(book) == "") {
-    return res.status(404).json({ error: "The book was not found." });
+  
+  if (book.length > 0) {
+    let booksByAuthor = {
+      "booksbyauthor": book
+    };
+    return res.status(200).send(JSON.stringify(booksByAuthor));
   } else {
-    return res.status(200).send(JSON.stringify(book));
+    return res.status(404).json({ error: "The book was not found." });
   }
 });
 
 // Get all books based on title
 public_users.get('/title/:title', function (req, res) {
   let title = req.params.title.toLowerCase();
-  let book = {};
+  let book = [];
   let keys = Object.keys(books);
 
   for (let i = 0; i < keys.length; i++) {
@@ -72,14 +80,22 @@ public_users.get('/title/:title', function (req, res) {
     let currentTitle = currentBooks["title"].toLowerCase();
 
     if (currentTitle === title) {
-      book[i + 1] = currentBooks;
+      book.push({
+        "isbn": i + 1,
+        "author": currentBooks["author"],
+        "reviews": currentBooks["reviews"]
+      });
     }
 
   }
-  if (Object.keys(book) == "") {
-    return res.status(404).json({ error: "The book was not found." });
+  if (book.length > 0) {
+    let booksByTitle = {
+      "booksbytitle": book
+    };
+    return res.status(200).send(JSON.stringify(booksByTitle));
+
   } else {
-    return res.status(200).send(JSON.stringify(book));
+    return res.status(404).json({ error: "The book was not found." });
   }
 });
 
@@ -92,11 +108,7 @@ public_users.get('/review/:isbn', function (req, res) {
   }
   let reviews = books[isbn].reviews;
   reviews = JSON.stringify(reviews);
-  if (reviews != '{}') {
-    return res.status(200).send(reviews);
-  } else {
-    return res.status(404).json({ error: "This book has no reviews." });
-  }
+  return res.status(200).send(reviews);
 });
 
 const BASE_URL = 'http://localhost:5000';
